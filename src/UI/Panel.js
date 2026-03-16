@@ -378,7 +378,7 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
         this.questions = contents;
 
         // Create image for displaying question content
-        this.contentImage = scene.add.image(0, 50, '').setDepth(200).setVisible(false);
+        this.contentImage = scene.add.image(0, 20, '').setDepth(200).setVisible(false);
 
         this.questionBackground = scene.add.image(0, 20, '').setDepth(199).setVisible(false);
 
@@ -393,6 +393,17 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
 
         this.confirmBtn.setVisible(false); // 初始隱藏，等選擇答案後才顯示
 
+        // Navigation buttons: prev = back to question, next = go to options
+        this.prevNavBtn = new CustomButton(scene, -650, 320, 'prev_button', 'prev_button_click', () => {
+            this.showQuestion();
+        });
+        this.nextNavBtn = new CustomButton(scene, 650, 320, 'next_button', 'next_button_click', () => {
+            this.showOptions();
+        });
+        this.add([this.prevNavBtn, this.nextNavBtn]);
+        this.prevNavBtn.setVisible(false);
+        this.nextNavBtn.setVisible(false);
+
         this.optionButtons = [];
         this.showQuestion();
         scene.add.existing(this);
@@ -400,22 +411,31 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
 
     showQuestion() {
         const q = this.questions[this.currentIndex];
-        this.contentImage.setTexture(q.question).setVisible(true)
-            .setInteractive({ useHandCursor: true });
-        this.contentImage.once('pointerdown', () => {
-            this.contentImage.setVisible(false);
-            this.showOptions();
-        });
+        // Hide options view elements
+        this.questionBackground.setVisible(false);
+        if (this.optionButtons) {
+            this.optionButtons.forEach(btn => btn.setVisible(false));
+        }
+        this.confirmBtn.setVisible(false);
+        this.prevNavBtn.setVisible(false);
+        // Show question image and next nav button
+        this.contentImage.setTexture(q.question).setVisible(true);
+        this.nextNavBtn.setVisible(true);
     }
 
     showOptions() {
         const q = this.questions[this.currentIndex];
+        // Hide question view elements
+        this.contentImage.setVisible(false);
+        this.nextNavBtn.setVisible(false);
+        // Show options view elements
         this.questionBackground.setTexture(q.questionBackground).setVisible(true);
         if (this.optionButtons) {
             this.optionButtons.forEach(btn => btn.destroy());
         }
         this.optionButtons = [];
         this.confirmBtn.setVisible(true);
+        this.prevNavBtn.setVisible(true);
 
         const options = q.options || q.option; // Support both 'options' and 'option'
         options.forEach((optKey, index) => {
@@ -469,6 +489,8 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
         this.optionButtons.forEach(btn => btn.setVisible(false));
         this.contentImage.setVisible(false);
         this.confirmBtn.setVisible(false);
+        this.prevNavBtn.setVisible(false);
+        this.nextNavBtn.setVisible(false);
 
         const descImg = this.scene.add.image(0, 0, descriptionKey)
             .setInteractive({ useHandCursor: true }).setDepth(300);
@@ -488,10 +510,8 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
                 this.scene.gameTimer.reset(this.scene.roundPerSeconds);
                 this.scene.gameTimer.start();
             }
-            this.confirmBtn.setVisible(true);
             this.selectedAnswerIndex = -1;
-            this.showQuestion();
-            this.showOptions();
+            this.showQuestion(); // Start next question from question view
         } else {
             console.log('All questions answered correctly!');
             this.scene.onRoundWin();
