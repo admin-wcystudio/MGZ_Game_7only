@@ -394,7 +394,7 @@ export class QuestionPanel extends Phaser.GameObjects.Container {
         this.confirmBtn.setVisible(false); // 初始隱藏，等選擇答案後才顯示
 
         // Navigation buttons: prev = back to question, next = go to options
-        this.prevNavBtn = new CustomButton(scene, -650, 320, 'prev_button', 'prev_button_click', () => {
+        this.prevNavBtn = new CustomButton(scene, -680, 320, 'prev_button', 'prev_button_click', () => {
             this.showQuestion();
         });
         this.nextNavBtn = new CustomButton(scene, 650, 320, 'next_button', 'next_button_click', () => {
