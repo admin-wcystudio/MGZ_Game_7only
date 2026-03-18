@@ -15,6 +15,7 @@ export class GameScene_7 extends BaseGameScene {
 
         this.load.image('game7_npc_box_win', `${path}game7_npc_box4.png`);
         this.load.image('game7_npc_box_tryagain', `${path}game7_npc_box5.png`);
+        this.load.image('game7_npc_box6', `${path}game7_npc_box6.png`);
 
         this.load.video('game_success', `${path}game7_success_bg.mp4`);
         this.load.video('game_fail', `${path}game7_fail_bg.mp4`);
@@ -134,6 +135,19 @@ export class GameScene_7 extends BaseGameScene {
 
 
     }
+
+    onWinBubbleClose() {
+        const centerX = this.cameras.main.width / 2;
+        const centerY = this.cameras.main.height * 0.8;
+        this.dialog = this.add.image(centerX, centerY, 'game7_npc_box6')
+            .setInteractive({ useHandCursor: true }).setDepth(566).setVisible(true);
+        this.dialog.on('pointerdown', () => {
+            this.dialog.destroy();
+            this.dialog = null;
+        });
+    }
+
+
     handleLose() {
         // Prevent multiple entries
         if (this.gameState === 'gameLose') return;
